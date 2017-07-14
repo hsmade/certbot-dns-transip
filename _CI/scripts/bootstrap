@@ -1,23 +1,25 @@
 #!/bin/bash
 cd $(dirname $0)/../..
 
-test -z "${TRAVIS}" && pip install virtualenvwrapper
-source $(which virtualenvwrapper.sh)
-
-[ -z "$WORKON_HOME" ] && WORKON_HOME=$HOME/.virtualenvs
-
-if (! test -d "$WORKON_HOME/certbot_dns_transip")
+if test -z "${TRAVIS}"
 then
-  echo "Creating virtual env for certbot_dns_transip"
-  if (! mkvirtualenv "certbot_dns_transip" )
-  then
-    echo "Missing prerequisite virtualenvwrapper, bailing out"
-    exit 1
-  fi
-fi
+    source $(which virtualenvwrapper.sh)
 
-echo "Working on virtualenv certbot_dns_transip"
-source "$WORKON_HOME/certbot_dns_transip/bin/activate"
+    [ -z "$WORKON_HOME" ] && WORKON_HOME=$HOME/.virtualenvs
+
+    if (! test -d "$WORKON_HOME/certbot_dns_transip")
+    then
+      echo "Creating virtual env for certbot_dns_transip"
+      if (! mkvirtualenv "certbot_dns_transip" )
+      then
+        echo "Missing prerequisite virtualenvwrapper, bailing out"
+        exit 1
+      fi
+    fi
+
+    echo "Working on virtualenv certbot_dns_transip"
+    source "$WORKON_HOME/certbot_dns_transip/bin/activate"
+fi
 
 echo "Installing python package requirements.."
 pip install -r requirements.txt

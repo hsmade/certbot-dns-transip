@@ -3,16 +3,21 @@ dist: trusty
 cache: pip
 
 install:
-  - pip install virtualenvwrapper
-  - source $(which virtualenvwrapper.sh)
   - pip install -r requirements.txt
   - pip install -r requirements/development.txt
   - pip install -r requirements/documentation.txt
   - pip install -r requirements/testing.txt
 
-script:
-  - ./_CI/scripts/lint
-  - ./_CI/scripts/test
-  - ./_CI/scripts/build
-  - ./_CI/scripts/upload
-  - test -z "${TRAVIS_TAG}" && ./_CI/scripts/upload
+jobs:
+  include:
+    - stage: lint
+      script: ./_CI/scripts/lint
+    - stage: test
+      script: ./_CI/scripts/test
+    - stage: build
+      script: ./_CI/scripts/build
+    - stage: upload
+      on:
+        # tags: true
+        branch: master
+      script: ./_CI/scripts/upload
