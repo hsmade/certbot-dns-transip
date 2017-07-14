@@ -1,18 +1,24 @@
 language: python
 dist: trusty
 services:
-  - docker
-
+- docker
 before_install:
-  - docker pull python:2.7
-
+- docker pull python:2.7
+install: echo 'Skipping install'
 jobs:
   include:
-    - stage: lint
-      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/lint
-    - stage: test
-      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/test
-    - stage: build
-      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/build
-    - stage: upload
-      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/upload
+  - stage: lint
+    script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/lint
+  - stage: test
+    script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/test
+  - stage: build
+    script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/build
+before_deploy: ./_CI/scripts/build &&
+deploy:
+  provider: pypi
+  user: wfournier
+  on:
+#    tags: true
+    branch: master
+  password:
+    secure: NWFZ84dSpLYsfFTOE/rKZXuiyhZFtN6HOa/wWyLNBRji4uR0ffgPT2csVI/CuHsCollvedDBTP1EZbhDMfHhKxxRua4qImCfa4a9LNIczcGXDj0QDuG0jGAURVGQO3GQqUCNrv1NPOamIx0F2tUqXgFwl6k6orGtPBDonodCNAGe1OU9BO6OKyf9vSv/fQn5KTm8ntmIOenL2MDpy2y9PG9TkcMG8uUp9GDt5xkiWtaET9L3+iJgyxzrrs8qGJcT+NHfPdAaefRhwU14aeRGHSriL65ycUfLfCq81c5lX4f3CitAcUwUYav0QYG0fuK/oODNL4z5lDEtH7m65FHQdA9fIUWPNxlcnDmm6iAPIU4L2Ll8KLueU/i3/+tsi1nRPUPcEkS8QXpGUkVjcm/8ONu81I5NCYYIkMPrikdI5UIKILl8BAulh0Gdsodk4z41aZtW/Jd11cCYkS52tlRoqsdq7RdzEK4pP3E1w6paT55meNGoKRiMTIwa0RaYugudiQxuL0bKVwbBLKEwpiYdRMxbeX1sjf6cS5jhqTxRQQfq/uZUKXoj/GPAGu5/S0YHgdlUHph31eFGJlOIMaf0OKkEJP2WbN6KiA9iV7RUf3UUTgWnDkc7JuoPjvJre1Y1mcfkgHs7763bhO/1o6hQ5iKXqUQsWbYLJNJZVLW+Xd8=
