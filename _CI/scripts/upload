@@ -10,13 +10,12 @@ if test -n "${TRAVIS}"
 then
     echo "Creating pypirc file"
     cat << EOF > ~/.pypirc
-    [distutils]
-    index-servers =
-        pypi
+[distutils]
+index-servers = pypi
 
-    [pypi]
-    username: ${PYPI_USER}
-    password: ${PYPI_PASSWORD}
+[pypi]
+username: ${PYPI_USER}
+password: ${PYPI_PASSWORD}
 EOF
 fi
 # we want all these files to exist in the actual package
