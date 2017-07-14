@@ -20,7 +20,7 @@ jobs:
       provider: pypi
       user: wfournier
       skip_cleanup: true
-      server: https://testpypi.python.org/pypi
+      server: https://test.pypi.org/legacy/
       on:
     #    tags: true
         branch: master
