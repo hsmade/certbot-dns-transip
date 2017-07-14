@@ -14,6 +14,7 @@ jobs:
   - stage: build
     script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/build
   - stage: deploy
+    script: skip
     before_deploy: ./_CI/scripts/copy_version_file
     deploy:
       provider: pypi
