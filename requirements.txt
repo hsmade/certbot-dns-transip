@@ -1,0 +1,7 @@
+acme
+certbot
+transip>=0.3.0
+setuptools>=1.0
+six
+zope.interface
+suds-jurko==0.6

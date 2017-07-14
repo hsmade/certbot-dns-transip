@@ -1,0 +1,15 @@
+#!/bin/bash --login
+cd $(dirname $0)/../..
+
+. ./_CI/scripts/bootstrap
+
+pip install -r requirements/testing.txt
+
+rm -rf test-output
+mkdir -p test-output
+tox
+exit_code=$?
+open test-output/coverage/index.html 2> /dev/null|| xdg-open test-output/coverage/index.html &
+sleep 1
+open test-output/nosetests.html 2> /dev/null|| xdg-open test-output/nosetests.html &
+exit $exit_code

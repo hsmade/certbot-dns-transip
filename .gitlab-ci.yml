@@ -1,0 +1,50 @@
+stages:
+  - lint
+  - test
+  - build
+  - upload
+  - docs
+
+lint:
+  tags:
+    - docker
+  stage: lint
+  image: ubuntu:trusty
+  script:
+    - _CI/scripts/lint
+
+test:
+  tags:
+    - docker
+  stage: test
+  image: ubuntu:trusty
+  script:
+    - _CI/scripts/test
+
+build:
+  tags:
+    - docker
+  stage: build
+  image: ubuntu:trusty
+  script:
+    - _CI/scripts/build
+
+upload:
+  tags:
+    - docker
+  stage: upload
+  image: ubuntu:trusty
+  only:
+    - tags
+  script:
+    - _CI/scripts/upload
+
+docs:
+  tags:
+    - docker
+  stage: docs
+  image: ubuntu:trusty
+  only:
+    - tags
+  script:
+    - _CI/scripts/document

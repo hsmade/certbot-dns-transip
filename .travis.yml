@@ -1,0 +1,13 @@
+language: python
+dist: trusty
+
+jobs:
+  include:
+    - stage: lint
+      script: ./_CI/scripts/lint
+    - stage: test
+      script: ./_CI/scripts/test
+    - stage: build
+      script: ./_CI/scripts/build
+    - stage: upload
+      script: ./_CI/scripts/upload

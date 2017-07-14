@@ -1,0 +1,6 @@
+[FORMAT]
+max-line-length=121
+disable=locally-disabled, locally-enabled
+
+[General]
+init-hook='import sys; sys.path.append("certbot-dns-transip")'

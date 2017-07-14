@@ -1,0 +1,26 @@
+#!/bin/bash --login
+set -e
+cd $(dirname $0)/../..
+
+. _CI/scripts/bootstrap
+
+rm -rf build dist
+
+# we want all these files to exist in the actual package
+cp .VERSION certbot_dns_transip/.VERSION
+cp LICENSE certbot_dns_transip/LICENSE
+cp AUTHORS.rst certbot_dns_transip/AUTHORS.rst
+cp CONTRIBUTING.rst certbot_dns_transip/CONTRIBUTING.rst
+cp HISTORY.rst certbot_dns_transip/HISTORY.rst
+cp README.rst certbot_dns_transip/README.rst
+cp USAGE.rst certbot_dns_transip/USAGE.rst
+
+python setup.py sdist bdist_egg
+
+rm certbot_dns_transip/.VERSION
+rm certbot_dns_transip/LICENSE
+rm certbot_dns_transip/AUTHORS.rst
+rm certbot_dns_transip/CONTRIBUTING.rst
+rm certbot_dns_transip/HISTORY.rst
+rm certbot_dns_transip/README.rst
+rm certbot_dns_transip/USAGE.rst
