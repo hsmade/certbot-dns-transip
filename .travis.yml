@@ -19,6 +19,8 @@ jobs:
     deploy:
       provider: pypi
       user: wfournier
+      skip_cleanup: true
+      server: https://testpypi.python.org/pypi
       on:
     #    tags: true
         branch: master
