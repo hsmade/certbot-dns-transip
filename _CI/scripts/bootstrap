@@ -1,6 +1,7 @@
 #!/bin/bash
 cd $(dirname $0)/../..
 
+test -z "$(which virtualenvwrapper.sh)" && pip install --user virtualenvwrapper
 source $(which virtualenvwrapper.sh)
 
 [ -z "$WORKON_HOME" ] && WORKON_HOME=$HOME/.virtualenvs
