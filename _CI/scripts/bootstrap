@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname $0)/../..
 
-test "${TRAVIS_CI}" == "1" && pip install virtualenvwrapper
+test -z "${TRAVIS}" && pip install virtualenvwrapper
 source $(which virtualenvwrapper.sh)
 
 [ -z "$WORKON_HOME" ] && WORKON_HOME=$HOME/.virtualenvs
