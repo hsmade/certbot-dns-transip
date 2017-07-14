@@ -6,20 +6,24 @@ cd $(dirname $0)/../..
 
 rm -rf build dist
 
-test -z "${TRAVIS}" && cat << EOF > ~/.pypirc
-[distutils]
-index-servers =
-    pypi
+if test -n "${TRAVIS}"
+then
+    echo "Creating pypirc file"
+    cat << EOF > ~/.pypirc
+    [distutils]
+    index-servers =
+        pypi
 
-[pypi]
-username: ${PYPI_USER}
-password: ${PYPI_PASSWORD}
+    [pypi]
+    username: ${PYPI_USER}
+    password: ${PYPI_PASSWORD}
 EOF
+fi
 # we want all these files to exist in the actual package
 _CI/scripts/copy_version_file
 
-python setup.py sdist bdist_egg upload
+python setup.py sdist upload
 
-test -z "${TRAVIS}" && rm -f ~/.pypirc
+test -n "${TRAVIS}" && rm -vf ~/.pypirc
 
 _CI/scripts/remove_version_file
