@@ -1,9 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: UTF-8 -*-
 # File: dns_transip.py
-"""
-certbot DNS plugin for Transip
-"""
+"""certbot DNS plugin for Transip"""
 
 import logging
 import os
@@ -92,9 +90,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
 
 class _TransipClient(object):
-    """
-    Encapsulates all communication with the Transip API.
-    """
+    """Encapsulates all communication with the Transip API."""
 
     def __init__(self, username, key_file):
         self.logger = logger.getChild(self.__class__.__name__)
@@ -157,7 +153,6 @@ class _TransipClient(object):
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
         :param str record_content: The record content (typically the challenge validation).
         """
-
         try:
             domain = self._find_domain(domain_name)
         except suds.WebFault as e:
