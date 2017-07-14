@@ -13,7 +13,9 @@ jobs:
     script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/test
   - stage: build
     script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/build
-before_deploy: ./_CI/scripts/build
+
+before_deploy: ./_CI/scripts/copy_version_file
+
 deploy:
   provider: pypi
   user: wfournier

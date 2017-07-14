@@ -1,0 +1,11 @@
+#!/bin/bash --login
+set -e
+cd $(dirname $0)/../..
+
+cp .VERSION certbot_dns_transip/.VERSION
+cp LICENSE certbot_dns_transip/LICENSE
+cp AUTHORS.rst certbot_dns_transip/AUTHORS.rst
+cp CONTRIBUTING.rst certbot_dns_transip/CONTRIBUTING.rst
+cp HISTORY.rst certbot_dns_transip/HISTORY.rst
+cp README.rst certbot_dns_transip/README.rst
+cp USAGE.rst certbot_dns_transip/USAGE.rst
