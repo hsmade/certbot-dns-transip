@@ -1,13 +1,18 @@
 language: python
 dist: trusty
+services:
+  - docker
+
+before_install:
+  - docker pull python:2.7
 
 jobs:
   include:
     - stage: lint
-      script: ./_CI/scripts/lint
+      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src/_CI/scripts/lint
     - stage: test
-      script: ./_CI/scripts/test
+      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/test
     - stage: build
-      script: ./_CI/scripts/build
+      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/build
     - stage: upload
-      script: ./_CI/scripts/upload
+      script: docker run -e TRAVIS_CI=1 -ti -v $PWD:/src python:2.7 /src//_CI/scripts/upload
