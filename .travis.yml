@@ -11,7 +11,4 @@ jobs:
     - stage: build
       script: ./_CI/scripts/build
     - stage: upload
-      on:
-        tags: true
-        branch: master
       script: ./_CI/scripts/upload

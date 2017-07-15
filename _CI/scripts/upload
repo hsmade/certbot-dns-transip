@@ -8,6 +8,11 @@ rm -rf build dist
 
 if test -n "${TRAVIS}"
 then
+    if test -z "${TRAVIS_TAG}"
+    then
+        echo "Not a tagged build, not uploading"
+        exit 0
+    fi
     echo "Creating pypirc file"
     cat << EOF > ~/.pypirc
 [distutils]
