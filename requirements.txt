@@ -1,7 +1,7 @@
-acme
-certbot
+acme>=0.16.0
+certbot>=0.16.0
 transip>=0.3.0
 setuptools>=1.0
-six
-zope.interface
+six>=1.10.0
+zope.interface>=4.4.2
 suds-jurko==0.6
