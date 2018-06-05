@@ -1,5 +1,5 @@
 from unittest import TestCase
-from transip.service.dns import DnsEntry
+from transip.service.objects import DnsEntry
 from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
