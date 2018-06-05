@@ -6,7 +6,10 @@ cd $(dirname $0)/../..
 pip install -r requirements/testing.txt
 
 rm -rf test-output
-mkdir -p test-output
+mkdir -p test-output/coverage
+# start: what?
+touch test-output/coverage/index.html
+# end: what?
 tox
 exit_code=$?
 open test-output/coverage/index.html 2> /dev/null|| xdg-open test-output/coverage/index.html &
