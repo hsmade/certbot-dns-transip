@@ -7,12 +7,14 @@ pip install -r requirements/testing.txt
 
 rm -rf test-output
 mkdir -p test-output/coverage
-# start: what?
 touch test-output/coverage/index.html
-# end: what?
 tox
 exit_code=$?
-open test-output/coverage/index.html 2> /dev/null|| xdg-open test-output/coverage/index.html &
-sleep 1
-open test-output/nosetests.html 2> /dev/null|| xdg-open test-output/nosetests.html &
-exit $exit_code
+
+if [[ -z "${CI}" ]]; then
+    # if NOT in a CI env then do the following
+    open test-output/coverage/index.html 2> /dev/null|| xdg-open test-output/coverage/index.html &
+    sleep 1
+    open test-output/nosetests.html 2> /dev/null|| xdg-open test-output/nosetests.html &
+    exit $exit_code
+fi
