@@ -7,7 +7,7 @@ import logging
 import os
 from tempfile import mktemp
 
-from transip.service.dns import DnsEntry
+from transip.service.objects import DnsEntry
 from transip.service.domain import DomainService
 import suds
 import zope.interface
