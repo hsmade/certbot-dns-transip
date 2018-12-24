@@ -5,6 +5,7 @@ Usage
 To use certbot-dns-transip in a project:
 
 .. code-block:: bash
+
     # Get an API key from TransIP
     # Convert the key to an RSA key
     $ openssl rsa -in transip.key -out transip-rsa.key
