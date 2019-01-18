@@ -4,7 +4,7 @@ History
 -------
 
 0.1.2 (12-11-2018)
----
+---------------------
 
 * Updated the API for transip to current version
 
