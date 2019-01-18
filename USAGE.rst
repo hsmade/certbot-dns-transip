@@ -7,8 +7,13 @@ To use certbot-dns-transip in a project:
 .. code-block:: bash
 
     # Get an API key from TransIP
+    
     # Convert the key to an RSA key
     $ openssl rsa -in transip.key -out transip-rsa.key
+    
+    # make sure the rights are set correctly
+    $ chmod 600 transip-rsa.key
+    
     $ cat transip-rsa.key
     -----BEGIN RSA PRIVATE KEY-----
     MIIE........
