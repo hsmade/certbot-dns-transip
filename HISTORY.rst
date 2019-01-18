@@ -3,7 +3,7 @@
 History
 -------
 
-0.1.3 (18-01-2019)
+0.1.4 (18-01-2019)
 ---------------------
 
 * Added docker image + instructions
