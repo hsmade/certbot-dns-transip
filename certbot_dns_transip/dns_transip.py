@@ -169,13 +169,9 @@ class _TransipClient(object):
                             and record.content == record_content]
 
         for record in matching_records:
-            try:
-                self.logger.info('Removing TXT record with name: %s', record.name)
-                del domain_records[domain_records.index(record)]
-            except suds.WebFault as e:
-                pass
-                self.logger.warn('Error deleting TXT record %s using the Transip API: %s',
-                                 record.name, e)
+            self.logger.info('Removing TXT record with name: %s', record.name)
+            del domain_records[domain_records.index(record)]
+
         try:
             self.domain_service.set_dns_entries(domain_name=domain, dns_entries=domain_records)
         except suds.WebFault as e:
