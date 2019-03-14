@@ -5,6 +5,7 @@
 
 import logging
 import os
+import time
 from tempfile import mktemp
 
 from transip.service.objects import DnsEntry
@@ -186,12 +187,37 @@ class _TransipClient(object):
                                             API
         """
 
-        try:
-            dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
-                                     .format(domain))
+        def _get_dns_entries_transip(self, domain):
+            try:
+                dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
+            except suds.WebFault as e:
+                self.logger.error('Error getting DNS records using the Transip API: %s', e)
+                raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
+                                         .format(domain))
+            return dns_entries
+
+        dns_entries = _get_dns_entries_transip(domain)
+
+        # If there are no DNS entries try again
+        # Retry after 5 seconds, 10 seconds and 20 seconds
+        if not dns_entries:
+            backoff = 5
+            self.logger.error('Error getting DNS records using the Transip API: '
+                              'retry in {} seconds'.format(backoff))
+            for retry in range(3):
+                time.sleep(backoff)
+                dns_entries = _get_dns_entries_transip(domain)
+                backoff = backoff * 2
+                if dns_entries:
+                    break
+
+        # If there are still no entries the Transip API gives back the wrong data
+        if not dns_entries:
+            self.logger.error('Error getting DNS records using the Transip API: '
+                              'Empty record set for {}'.format(domain))
+            raise errors.PluginError('Error finding DNS entries using the Transip API: '
+                                     'Empty record set for {}'.format(domain))
+
         return dns_entries
 
     def _find_domain(self, domain_name):
