@@ -89,6 +89,11 @@ class Authenticator(dns_common.DNSAuthenticator):
         return _TransipClient(username=username, key_file=key_file)
 
 
+        # TransIP sometimes returns an empty list of records this wipes the DNS
+        if not domain_records:
+            self.logger.error('Error getting DNS records using the Transip API: %s', e)
+            return
+
 class _TransipClient(object):
     """Encapsulates all communication with the Transip API."""
 
@@ -106,6 +111,7 @@ class _TransipClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
                                             API
         """
+
         try:
             domain = self._find_domain(domain_name)
         except suds.WebFault as e:
@@ -113,11 +119,7 @@ class _TransipClient(object):
             raise errors.PluginError('Error finding domain using the Transip API: {0}'
                                      .format(e))
 
-        try:
-            domain_records = self.domain_service.get_info(domain_name=domain).dnsEntries
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            return
+        domain_records = self.get_dns_entries(domain_name)
 
         try:
             new_record = DnsEntry(
@@ -159,16 +161,12 @@ class _TransipClient(object):
             self.logger.error('Error finding domain using the Transip API: %s', e)
             return
 
-        try:
-            domain_records = self.domain_service.get_info(domain_name=domain).dnsEntries
+        domain_records = self._get_dns_entries(domain_name=domain)
 
-            matching_records = [record for record in domain_records
-                                if record.type == 'TXT'
-                                and record.name == self._compute_record_name(domain, record_name)
-                                and record.content == record_content]
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            return
+        matching_records = [record for record in domain_records
+                            if record.type == 'TXT'
+                            and record.name == self._compute_record_name(domain, record_name)
+                            and record.content == record_content]
 
         for record in matching_records:
             try:
@@ -182,6 +180,23 @@ class _TransipClient(object):
             self.domain_service.set_dns_entries(domain_name=domain, dns_entries=domain_records)
         except suds.WebFault as e:
             self.logger.error('Error while storing DNS records: %s', e)
+
+    def _get_dns_entries(self, domain):
+        """
+        Get all DNS entries for this domain.
+
+        :param str domain_name: The domain to use to associate the record with.
+        :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
+                                            API
+        """
+
+        try:
+            dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
+        except suds.WebFault as e:
+            self.logger.error('Error getting DNS records using the Transip API: %s', e)
+            raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
+                                     .format(domain))
+        return dns_entries
 
     def _find_domain(self, domain_name):
         """
