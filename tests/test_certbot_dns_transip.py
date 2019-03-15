@@ -66,6 +66,24 @@ foobar
             self.correct_entry2,
         ])
 
+    def test__get_dns_entries(self):
+        self.domain_service.get_info = mock.MagicMock()
+
+        class FakeGetInfo(object):
+            dnsEntries = [self.correct_entry1, self.correct_entry2]
+        self.domain_service.get_info.return_value = FakeGetInfo
+        self.assertEquals(self.transip_client._get_dns_entries('example.com'), [self.correct_entry1, self.correct_entry2])
+
+    def test__get_dns_entries_empty_result_list(self):
+        self.domain_service.get_info = mock.MagicMock()
+
+        class FakeGetInfo(object):
+            dnsEntries = []
+        self.domain_service.get_info.return_value = FakeGetInfo
+
+        with self.assertRaises(PluginError):
+            self.transip_client._get_dns_entries('example.com')
+
     def test__find_domain(self):
         self.assertEquals(self.transip_client._find_domain('example.com'), 'example.com')
 
