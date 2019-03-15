@@ -172,7 +172,7 @@ class _TransipClient(object):
         except suds.WebFault as e:
             self.logger.error('Error while storing DNS records: %s', e)
 
-    def _get_dns_entries(self, domain):
+    def _get_dns_entries(self, domain, retries=3, backoff=5):
         """
         Get all DNS entries for this domain.
 
@@ -194,10 +194,9 @@ class _TransipClient(object):
         # If there are no DNS entries try again
         # Retry after 5 seconds, 10 seconds and 20 seconds
         if not dns_entries:
-            backoff = 5
             self.logger.error('Error getting DNS records using the Transip API: '
                               'retry in {} seconds'.format(backoff))
-            for retry in range(3):
+            for retry in range(retries):
                 time.sleep(backoff)
                 dns_entries = _get_dns_entries_transip(domain)
                 backoff = backoff * 2

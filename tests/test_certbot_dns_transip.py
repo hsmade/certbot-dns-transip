@@ -73,6 +73,7 @@ foobar
             dnsEntries = [self.correct_entry1, self.correct_entry2]
         self.domain_service.get_info.return_value = FakeGetInfo
         self.assertEquals(self.transip_client._get_dns_entries('example.com'), [self.correct_entry1, self.correct_entry2])
+        self.assertEqual(self.domain_service.get_info.call_count, 1)
 
     def test__get_dns_entries_empty_result_list(self):
         self.domain_service.get_info = mock.MagicMock()
@@ -82,7 +83,9 @@ foobar
         self.domain_service.get_info.return_value = FakeGetInfo
 
         with self.assertRaises(PluginError):
-            self.transip_client._get_dns_entries('example.com')
+            # default retries is 3, and backoff is 5 but let's change this to 1 to not delay the test
+            self.transip_client._get_dns_entries('example.com', retries=1, backoff=1)
+        self.assertEqual(self.domain_service.get_info.call_count, 2)
 
     def test__find_domain(self):
         self.assertEquals(self.transip_client._find_domain('example.com'), 'example.com')
