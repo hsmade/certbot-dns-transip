@@ -90,11 +90,6 @@ class Authenticator(dns_common.DNSAuthenticator):
         return _TransipClient(username=username, key_file=key_file)
 
 
-        # TransIP sometimes returns an empty list of records this wipes the DNS
-        if not domain_records:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            return
-
 class _TransipClient(object):
     """Encapsulates all communication with the Transip API."""
 
@@ -112,7 +107,6 @@ class _TransipClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
                                             API
         """
-
         try:
             domain = self._find_domain(domain_name)
         except suds.WebFault as e:
@@ -186,7 +180,6 @@ class _TransipClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
                                             API
         """
-
         def _get_dns_entries_transip(self, domain):
             try:
                 dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
