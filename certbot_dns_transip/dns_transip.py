@@ -5,6 +5,7 @@
 
 import logging
 import os
+import time
 from tempfile import mktemp
 
 from transip.service.objects import DnsEntry
@@ -113,11 +114,7 @@ class _TransipClient(object):
             raise errors.PluginError('Error finding domain using the Transip API: {0}'
                                      .format(e))
 
-        try:
-            domain_records = self.domain_service.get_info(domain_name=domain).dnsEntries
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            return
+        domain_records = self.get_dns_entries(domain_name)
 
         try:
             new_record = DnsEntry(
@@ -159,29 +156,61 @@ class _TransipClient(object):
             self.logger.error('Error finding domain using the Transip API: %s', e)
             return
 
-        try:
-            domain_records = self.domain_service.get_info(domain_name=domain).dnsEntries
+        domain_records = self._get_dns_entries(domain_name=domain)
 
-            matching_records = [record for record in domain_records
-                                if record.type == 'TXT'
-                                and record.name == self._compute_record_name(domain, record_name)
-                                and record.content == record_content]
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
-            return
+        matching_records = [record for record in domain_records
+                            if record.type == 'TXT'
+                            and record.name == self._compute_record_name(domain, record_name)
+                            and record.content == record_content]
 
         for record in matching_records:
-            try:
-                self.logger.info('Removing TXT record with name: %s', record.name)
-                del domain_records[domain_records.index(record)]
-            except suds.WebFault as e:
-                pass
-                self.logger.warn('Error deleting TXT record %s using the Transip API: %s',
-                                 record.name, e)
+            self.logger.info('Removing TXT record with name: %s', record.name)
+            del domain_records[domain_records.index(record)]
+
         try:
             self.domain_service.set_dns_entries(domain_name=domain, dns_entries=domain_records)
         except suds.WebFault as e:
             self.logger.error('Error while storing DNS records: %s', e)
+
+    def _get_dns_entries(self, domain, retries=3, backoff=5):
+        """
+        Get all DNS entries for this domain.
+
+        :param str domain_name: The domain to use to associate the record with.
+        :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
+                                            API
+        """
+        def _get_dns_entries_transip(self, domain):
+            try:
+                dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
+            except suds.WebFault as e:
+                self.logger.error('Error getting DNS records using the Transip API: %s', e)
+                raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
+                                         .format(domain))
+            return dns_entries
+
+        dns_entries = _get_dns_entries_transip(domain)
+
+        # If there are no DNS entries try again
+        # Retry after 5 seconds, 10 seconds and 20 seconds
+        if not dns_entries:
+            self.logger.error('Error getting DNS records using the Transip API: '
+                              'retry in {} seconds'.format(backoff))
+            for retry in range(retries):
+                time.sleep(backoff)
+                dns_entries = _get_dns_entries_transip(domain)
+                backoff = backoff * 2
+                if dns_entries:
+                    break
+
+        # If there are still no entries the Transip API gives back the wrong data
+        if not dns_entries:
+            self.logger.error('Error getting DNS records using the Transip API: '
+                              'Empty record set for {}'.format(domain))
+            raise errors.PluginError('Error finding DNS entries using the Transip API: '
+                                     'Empty record set for {}'.format(domain))
+
+        return dns_entries
 
     def _find_domain(self, domain_name):
         """
