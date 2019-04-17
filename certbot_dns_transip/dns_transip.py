@@ -180,7 +180,7 @@ class _TransipClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
                                             API
         """
-        def _get_dns_entries_transip(self, domain):
+        def _get_dns_entries_transip(domain):
             try:
                 dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
             except suds.WebFault as e:
