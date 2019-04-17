@@ -42,7 +42,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         self.temp_file = None
 
     @classmethod
-    def add_parser_arguments(cls, add):  # pylint: disable=arguments-differ
+    def add_parser_arguments(cls, add, **kwargs):  # pylint: disable=arguments-differ
         super(Authenticator, cls).add_parser_arguments(add, default_propagation_seconds=240)
         add('credentials', help='Transip credentials INI file.')
 
@@ -176,39 +176,31 @@ class _TransipClient(object):
         """
         Get all DNS entries for this domain.
 
-        :param str domain_name: The domain to use to associate the record with.
+        :param str domain: The domain to use to associate the record with.
         :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
                                             API
         """
-        def _get_dns_entries_transip(self, domain):
+        dns_entries = []
+        for retry in range(retries + 1):
             try:
                 dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
             except suds.WebFault as e:
                 self.logger.error('Error getting DNS records using the Transip API: %s', e)
                 raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
                                          .format(domain))
-            return dns_entries
+            if dns_entries:
+                break
+            self.logger.warning('Error getting DNS records using the Transip API: retry in {} seconds'.format(
+                backoff
+            ))
+            time.sleep(backoff)
+            backoff = backoff * 2
 
-        dns_entries = _get_dns_entries_transip(domain)
-
-        # If there are no DNS entries try again
-        # Retry after 5 seconds, 10 seconds and 20 seconds
+        # If there are still no entries then the Transip API returned the wrong data
         if not dns_entries:
-            self.logger.error('Error getting DNS records using the Transip API: '
-                              'retry in {} seconds'.format(backoff))
-            for retry in range(retries):
-                time.sleep(backoff)
-                dns_entries = _get_dns_entries_transip(domain)
-                backoff = backoff * 2
-                if dns_entries:
-                    break
-
-        # If there are still no entries the Transip API gives back the wrong data
-        if not dns_entries:
-            self.logger.error('Error getting DNS records using the Transip API: '
-                              'Empty record set for {}'.format(domain))
-            raise errors.PluginError('Error finding DNS entries using the Transip API: '
-                                     'Empty record set for {}'.format(domain))
+            error = 'Error finding DNS entries using the Transip API: Empty record set for {}'.format(domain)
+            self.logger.error(error)
+            raise errors.PluginError(error)
 
         return dns_entries
 
