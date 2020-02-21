@@ -222,9 +222,8 @@ class _TransipClient(object):
                 self.logger.debug('Found base domain for %s using name %s', domain_name, guess)
                 return guess
 
-        raise errors.PluginError('Unable to determine base domain for {0} using names: {1}.'
-                                 # .format(domain_name, domain_name_guesses)
-                                 )
+        raise errors.PluginError('Unable to determine base domain for {0} using names: {1} and domains: {2}.'
+                                 .format(domain_name, domain_name_guesses, domains))
 
     @staticmethod
     def _compute_record_name(domain, full_record_name):
