@@ -6,4 +6,4 @@ cd $(dirname $0)/../..
 
 pip3 install -r requirements/testing.txt
 
-prospector -DFM && echo No issues found
+prospector -FM --profile=default && echo No issues found

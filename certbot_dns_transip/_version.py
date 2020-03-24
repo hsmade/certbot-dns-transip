@@ -1,5 +1,5 @@
 """
-Defines __version__
+Defines __version__.
 
 Set the package version here
 """
