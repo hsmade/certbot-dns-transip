@@ -1,3 +1,3 @@
-FROM python:2.7
+FROM python:3.8
 RUN pip install certbot-dns-transip
-CMD ["certbot"]
+ENTRYPOINT ["certbot"]
