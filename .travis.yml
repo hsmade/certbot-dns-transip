@@ -1,5 +1,5 @@
 language: python
-python: 2.7
+python: 3.8
 dist: trusty
 cache: pip
 
