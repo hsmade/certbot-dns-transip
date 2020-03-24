@@ -3,6 +3,13 @@
 History
 -------
 
+0.3.0 (24-03-2020)
+---------------------
+
+* updated CI and docker to python 3.6
+* changed dockerfile from using CMD to ENTRYPOINT
+
+
 0.2.6 (21-03-2020)
 ---------------------
 
