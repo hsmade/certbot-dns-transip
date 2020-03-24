@@ -2,7 +2,7 @@
 cd $(dirname $0)/../..
 
 . _CI/scripts/bootstrap
-pip install -r requirements/documentation.txt
+pip3 install -r requirements/documentation.txt
 
 rm -f docs/test_docs.rst
 rm -f docs/modules.rst

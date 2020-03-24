@@ -4,6 +4,6 @@ cd $(dirname $0)/../..
 
 . _CI/scripts/bootstrap
 
-pip install -r requirements/testing.txt
+pip3 install -r requirements/testing.txt
 
 prospector -DFM && echo No issues found
