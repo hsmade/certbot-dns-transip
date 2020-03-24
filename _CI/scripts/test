@@ -3,7 +3,7 @@ cd $(dirname $0)/../..
 
 . ./_CI/scripts/bootstrap
 
-pip install -r requirements/testing.txt
+pip3 install -r requirements/testing.txt
 
 rm -rf test-output
 mkdir -p test-output/coverage

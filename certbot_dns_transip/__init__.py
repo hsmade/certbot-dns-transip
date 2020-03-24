@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-certbot_dns_transip package
+certbot_dns_transip package.
 
 Imports all parts from certbot_dns_transip here
 """

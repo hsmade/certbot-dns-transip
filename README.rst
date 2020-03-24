@@ -13,7 +13,7 @@ For example the following command can be used. This assumes the `transip.ini` fi
 
     docker run -ti -v `/tmp/letsencrypt`:/etc/letsencrypt \
         hsmade/certbot-transip \
-        certbot certonly -n \
+        certonly -n \
         -d 'your.domain.com' \
         -a certbot-dns-transip:dns-transip \
         --certbot-dns-transip:dns-transip-credentials /etc/letsencrypt/transip.ini \

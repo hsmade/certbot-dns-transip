@@ -1,7 +1,6 @@
-#!/usr/bin/env python2.7
 # -*- coding: UTF-8 -*-
 # File: dns_transip.py
-"""certbot DNS plugin for Transip"""
+"""certbot DNS plugin for Transip."""
 
 import logging
 import os
@@ -20,7 +19,7 @@ __author__ = '''Wim Fournier <wim@fournier.nl>'''
 __docformat__ = 'plaintext'
 __date__ = '''14-07-2017'''
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 # There seems to be a bug with suds where it tries to access invalid attributes on logging
 logging.getLogger('suds').setLevel('WARNING')
 
@@ -28,7 +27,9 @@ logging.getLogger('suds').setLevel('WARNING')
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
-    """DNS Authenticator for Transip
+
+    """
+    DNS Authenticator for Transip.
 
     This Authenticator uses the Transip API to fulfill a dns-01 challenge.
     """
@@ -36,17 +37,20 @@ class Authenticator(dns_common.DNSAuthenticator):
     description = 'Obtain certs using a DNS TXT record (if you are using Transip for DNS).'
 
     def __init__(self, *args, **kwargs):
+        """Setup object."""
         super(Authenticator, self).__init__(*args, **kwargs)
         self.credentials = None
-        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger = LOGGER.getChild(self.__class__.__name__)
         self.temp_file = None
 
     @classmethod
-    def add_parser_arguments(cls, add, **kwargs):  # pylint: disable=arguments-differ
+    def add_parser_arguments(cls, add, **_):  # pylint: disable=arguments-differ
         super(Authenticator, cls).add_parser_arguments(add, default_propagation_seconds=240)
         add('credentials', help='Transip credentials INI file.')
 
-    def more_info(self):  # pylint: disable=missing-docstring,no-self-use
+    # pylint: disable=no-self-use
+    def more_info(self):
+        """Returns info about this plugin."""
         return 'This plugin configures a DNS TXT record to respond to a dns-01 challenge using ' + \
                'the Transip API.'
 
@@ -90,11 +94,11 @@ class Authenticator(dns_common.DNSAuthenticator):
         return _TransipClient(username=username, key_file=key_file)
 
 
-class _TransipClient(object):
+class _TransipClient():
     """Encapsulates all communication with the Transip API."""
 
     def __init__(self, username, key_file):
-        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger = LOGGER.getChild(self.__class__.__name__)
         self.domain_service = DomainService(login=username, private_key_file=key_file)
 
     def add_txt_record(self, domain_name, record_name, record_content):
@@ -109,10 +113,10 @@ class _TransipClient(object):
         """
         try:
             domain = self._find_domain(domain_name)
-        except suds.WebFault as e:
-            self.logger.error('Error finding domain using the Transip API: %s', e)
+        except suds.WebFault as error:
+            self.logger.error('Error finding domain using the Transip API: %s', error)
             raise errors.PluginError('Error finding domain using the Transip API: {0}'
-                                     .format(e))
+                                     .format(error))
 
         domain_records = self._get_dns_entries(domain)
 
@@ -123,8 +127,8 @@ class _TransipClient(object):
                 content=record_content,
                 expire=1,
             )
-        except suds.WebFault as e:
-            self.logger.error('Error getting DNS records using the Transip API: %s', e)
+        except suds.WebFault as error:
+            self.logger.error('Error getting DNS records using the Transip API: %s', error)
             return
 
         domain_records.append(new_record)
@@ -132,10 +136,10 @@ class _TransipClient(object):
         try:
             self.domain_service.set_dns_entries(domain_name=domain, dns_entries=domain_records)
             self.logger.info('Successfully added TXT record')
-        except suds.WebFault as e:
-            self.logger.error('Error adding TXT record using the Transip API: %s', e)
+        except suds.WebFault as error:
+            self.logger.error('Error adding TXT record using the Transip API: %s', error)
             raise errors.PluginError('Error adding TXT record using the Transip API: {0}'
-                                     .format(e))
+                                     .format(error))
 
     def del_txt_record(self, domain_name, record_name, record_content):
         """
@@ -152,8 +156,8 @@ class _TransipClient(object):
         """
         try:
             domain = self._find_domain(domain_name)
-        except suds.WebFault as e:
-            self.logger.error('Error finding domain using the Transip API: %s', e)
+        except suds.WebFault as error:
+            self.logger.error('Error finding domain using the Transip API: %s', error)
             return
 
         domain_records = self._get_dns_entries(domain)
@@ -169,8 +173,8 @@ class _TransipClient(object):
 
         try:
             self.domain_service.set_dns_entries(domain_name=domain, dns_entries=domain_records)
-        except suds.WebFault as e:
-            self.logger.error('Error while storing DNS records: %s', e)
+        except suds.WebFault as error:
+            self.logger.error('Error while storing DNS records: %s', error)
 
     def _get_dns_entries(self, domain, retries=3, backoff=5):
         """
@@ -181,11 +185,11 @@ class _TransipClient(object):
                                             API
         """
         dns_entries = []
-        for retry in range(retries + 1):
+        for _ in range(retries + 1):
             try:
                 dns_entries = self.domain_service.get_info(domain_name=domain).dnsEntries
-            except suds.WebFault as e:
-                self.logger.error('Error getting DNS records using the Transip API: %s', e)
+            except suds.WebFault as error:
+                self.logger.error('Error getting DNS records using the Transip API: %s', error)
                 raise errors.PluginError('Error finding DNS entries using the Transip API: {0}'
                                          .format(domain))
             if dns_entries:
