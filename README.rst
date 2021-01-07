@@ -2,6 +2,14 @@
 certbot-dns-transip
 ===============================
 
+.. image:: https://readthedocs.org/projects/certbot-dns-transip/badge/?version=stable
+   :target: https://certbot-dns-transip.readthedocs.io/en/stable/?badge=stable
+   :alt: Documentation Status
+   
+.. image:: https://www.travis-ci.org/hsmade/certbot-dns-transip.svg?branch=master&status=passed
+   :target: https://www.travis-ci.org/github/hsmade/certbot-dns-transip
+   :alt: Build Status
+
 Certbot plugin to authenticate using dns TXT records via Transip API
 
 
