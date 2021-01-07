@@ -21,8 +21,8 @@ To use certbot-dns-transip in a project:
   
     # Create a transip.ini file
     $ cat transip.ini
-    certbot_dns_transip:dns_transip_username = my_username
-    certbot_dns_transip:dns_transip_key_file = /full/path/to/transip-rsa.key
+    dns_transip_username = my_username
+    dns_transip_key_file = /full/path/to/transip-rsa.key
     
     # Execute certbot
     $ certbot certonly -d <host.domain.tld> -a certbot-dns-transip:dns-transip --certbot-dns-transip:dns-transip-credentials transip.ini --certbot-dns-transip:dns-transip-propagation-seconds 240
