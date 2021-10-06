@@ -1,5 +1,6 @@
 from unittest import TestCase
-from transip.service.objects import DnsEntry
+
+import certbot
 from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
@@ -16,83 +17,62 @@ USERNAME = 'foobar'
 KEY_FILE = mktemp()
 
 
+class _TransipClientTest(_TransipClient):
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+
+class _DomainMock:
+    def __init__(self, name):
+        self.name = name
+
+
 class Test_TransipClient(TestCase):
     def setUp(self):
-        self.domain_service = mock.MagicMock()
+        self.client = mock.MagicMock()
         with open(KEY_FILE, 'w') as key_file:
             key_file.write('''-----BEGIN RSA PRIVATE KEY-----
 foobar
 -----END RSA PRIVATE KEY-----''')
-        self.transip_client = _TransipClient(username=USERNAME, key_file=KEY_FILE)
-        self.transip_client.domain_service = self.domain_service
-        self.domain_service.get_domain_names.return_value = ['example.com']
-        self.correct_entry1 = DnsEntry(name='record1', record_type='A', content='127.0.0.1', expire=1)
-        self.correct_entry2 = DnsEntry(name='record2', record_type='TXT', content='f00b4r', expire=1)
-        self.add_record = DnsEntry(name='test.test', record_type='TXT', content='new record', expire=1)
+        self.transip_client = _TransipClientTest()
+        self.transip_client.client = self.client
+        self.transip_client.client.domains = self.client
+        self.transip_client.client.domains.list.return_value = [_DomainMock(name="example.com")]
+
+        # self.correct_entry1 = {"name": "record1", "record_type": "A", "content": "127.0.0.1", "expire": 1}
+        # self.correct_entry2 = {"name": "record2", "record_type": "TXT", "content": "f00b4r", "expire": 1}
+        self.add_record = {"name": "test.test", "type": "TXT", "content": "new record", "expire": 1}
 
     def tearDown(self):
         os.unlink(KEY_FILE)
 
     def test_add_txt_record(self):
-        self.domain_service.get_info = mock.MagicMock()
+        domain = mock.MagicMock()
 
-        class FakeGetInfo(object):
-            dnsEntries = [self.correct_entry1, self.correct_entry2]
-        self.domain_service.get_info.return_value = FakeGetInfo
+        self.client.domains.get.return_value = domain
         self.transip_client.add_txt_record(
             domain_name='example.com',
             record_content='new record',
             record_name='test.test.example.com'
         )
-        self.domain_service.set_dns_entries.assert_called_once_with(domain_name='example.com', dns_entries=[
-            self.correct_entry1,
-            self.correct_entry2,
-            self.add_record
-        ])
+        domain.dns.create.assert_called_once_with(self.add_record)
 
     def test_del_txt_record(self):
-        self.domain_service.get_info = mock.MagicMock()
+        domain = mock.MagicMock()
 
-        class FakeGetInfo(object):
-            dnsEntries = [self.correct_entry1, self.add_record, self.correct_entry2]
-        self.domain_service.get_info.return_value = FakeGetInfo
+        self.client.domains.get.return_value = domain
         self.transip_client.del_txt_record(
             domain_name='example.com',
             record_content='new record',
             record_name='test.test.example.com'
         )
-        self.domain_service.set_dns_entries.assert_called_once_with(domain_name='example.com', dns_entries=[
-            self.correct_entry1,
-            self.correct_entry2,
-        ])
-
-    def test__get_dns_entries(self):
-        self.domain_service.get_info = mock.MagicMock()
-
-        class FakeGetInfo(object):
-            dnsEntries = [self.correct_entry1, self.correct_entry2]
-        self.domain_service.get_info.return_value = FakeGetInfo
-        self.assertEquals(self.transip_client._get_dns_entries('example.com'), [self.correct_entry1, self.correct_entry2])
-        self.assertEqual(self.domain_service.get_info.call_count, 1)
-
-    def test__get_dns_entries_empty_result_list(self):
-        self.domain_service.get_info = mock.MagicMock()
-
-        class FakeGetInfo(object):
-            dnsEntries = []
-        self.domain_service.get_info.return_value = FakeGetInfo
-
-        with self.assertRaises(PluginError):
-            # default retries is 3, and backoff is 5 but let's change this to 1 to not delay the test
-            self.transip_client._get_dns_entries('example.com', retries=1, backoff=1)
-        self.assertEqual(self.domain_service.get_info.call_count, 2)
+        domain.dns.delete.assert_called_once_with(self.add_record)
 
     def test__find_domain(self):
         self.assertEquals(self.transip_client._find_domain('example.com'), 'example.com')
 
     def test__find_domain_fail(self):
-        self.domain_service.get_domain_names.return_value = ['example2.com']
-        self.assertRaises(PluginError, self.transip_client._find_domain, 'example.com')
+        self.assertRaises(PluginError, self.transip_client._find_domain, 'example2.com')
 
     def test__compute_record_name(self):
         self.assertEquals(_TransipClient._compute_record_name('example.com', 'record.sub.example.com'), 'record.sub')
@@ -117,6 +97,7 @@ class AuthenticatorTest(test_util.TempDirTestCase, dns_test_common.BaseAuthentic
         self.auth._get_transip_client = mock.MagicMock(return_value=self.mock_client)
 
     def test_perform(self):
+        certbot._internal.display.obj.get_display = mock.MagicMock()
         self.auth.perform([self.achall])
 
         expected = [mock.call.add_txt_record(DOMAIN, '_acme-challenge.' + DOMAIN, mock.ANY)]

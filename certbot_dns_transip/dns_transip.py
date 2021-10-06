@@ -17,12 +17,12 @@ __docformat__ = 'plaintext'
 __date__ = '''14-07-2017'''
 
 LOGGER = logging.getLogger(__name__)
-TRANSIP_EXCEPTIONS = [
+TRANSIP_EXCEPTIONS = (
     transip.exceptions.TransIPError,
     transip.exceptions.TransIPHTTPError,
     transip.exceptions.TransIPIOError,
     transip.exceptions.TransIPParsingError
-]
+)
 
 
 @zope.interface.implementer(interfaces.IAuthenticator)
