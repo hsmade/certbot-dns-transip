@@ -34,6 +34,9 @@ jobs:
         with:
             python-version: 3.7
 
+      - name: install virtualenvwrapper
+        run: pip install virtualenv virtualenvwrapper
+
       - name: upload
         env:
           PYPI: ${{ secrets.PYPI }}
