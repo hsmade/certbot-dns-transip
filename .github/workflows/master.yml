@@ -29,6 +29,8 @@ jobs:
         run: ./_CI/scripts/build
 
       - name: upload
+        env:
+          PYPI: ${{ secrets.PYPI }}
         run: ./_CI/scripts/upload
 
       - name: Login to DockerHub
