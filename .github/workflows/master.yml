@@ -1,0 +1,33 @@
+name: build and publish
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+          
+      - name: install virtualenvwrapper
+        run: pip install virtualenv virtualenvwrapper
+     
+      - name: lint
+        run: ./_CI/scripts/lint
+        
+      - name: test
+        run: ./_CI/scripts/test
+        
+      - name: build
+        run: ./_CI/scripts/build
+        
+      - name: upload
+        run: ./_CI/scripts/upload
+        
