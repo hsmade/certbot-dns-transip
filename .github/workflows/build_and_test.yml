@@ -1,7 +1,10 @@
-name: test
+name: build and test
+
 on:
-  pull_request:
+  push:
     branches: [ master ]
+  pull_request:
+      branches: [ master ]
   workflow_dispatch:
 
 jobs:
