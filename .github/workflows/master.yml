@@ -17,7 +17,7 @@ jobs:
           python-version: 3.9
 
       - name: install support tools
-        run: pip install virtualenv virtualenvwrapper build twine
+        run: pip install virtualenv virtualenvwrapper
 
       - name: lint
         run: ./_CI/scripts/lint

@@ -4,6 +4,8 @@ cd $(dirname $0)/../..
 
 . _CI/scripts/bootstrap
 
+pip3 install -r requirements/build.txt
+
 rm -rf build dist
 
 # we want all these files to exist in the actual package
