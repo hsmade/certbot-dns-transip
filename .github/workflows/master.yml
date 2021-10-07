@@ -28,6 +28,12 @@ jobs:
       - name: build
         run: ./_CI/scripts/build
 
+      # https://github.com/pypa/distutils/issues/25
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+            python-version: 3.7
+
       - name: upload
         env:
           PYPI: ${{ secrets.PYPI }}
