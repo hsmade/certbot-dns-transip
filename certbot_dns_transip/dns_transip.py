@@ -49,7 +49,6 @@ class Authenticator(dns_common.DNSAuthenticator):
         super(Authenticator, cls).add_parser_arguments(add, default_propagation_seconds=240)
         add('credentials', help='Transip credentials INI file.')
 
-    # pylint: disable=no-self-use
     def more_info(self):
         """Returns info about this plugin."""
         return 'This plugin configures a DNS TXT record to respond to a dns-01 challenge using ' + \
@@ -109,8 +108,7 @@ class _TransipClient:
         :param str domain_name: The domain to use to associate the record with.
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
         :param str record_content: The record content (typically the challenge validation).
-        :raises certbot.errors.PluginError: if an error occurs communicating with the Transip
-                                            API
+        :raises certbot.errors.PluginError: if an error occurs communicating with the Transip API
         """
         canonical_domain = self._find_domain(domain_name)
 
