@@ -19,7 +19,9 @@ EOF
 # we want all these files to exist in the actual package
 _CI/scripts/copy_version_file
 
-python setup.py -v sdist upload --show-response -r pypi
+python3 -m build --sdist --wheel
+twine check dist/*
+twine upload dist/*
 
 rm -vf ~/.pypirc
 

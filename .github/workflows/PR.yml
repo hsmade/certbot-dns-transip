@@ -14,15 +14,15 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.9
-          
-      - name: install virtualenvwrapper
-        run: pip install virtualenv virtualenvwrapper
-     
+
+      - name: install support tools
+        run: pip install virtualenv virtualenvwrapper build twine
+
       - name: lint
         run: ./_CI/scripts/lint
-        
+
       - name: test
         run: ./_CI/scripts/test
-        
+
       - name: build
-        run: ./_CI/scripts/build        
+        run: ./_CI/scripts/build

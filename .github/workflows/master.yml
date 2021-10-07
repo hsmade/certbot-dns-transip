@@ -16,8 +16,8 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: install virtualenvwrapper
-        run: pip install virtualenv virtualenvwrapper
+      - name: install support tools
+        run: pip install virtualenv virtualenvwrapper build twine
 
       - name: lint
         run: ./_CI/scripts/lint
@@ -27,15 +27,6 @@ jobs:
 
       - name: build
         run: ./_CI/scripts/build
-
-      # https://github.com/pypa/distutils/issues/25
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-            python-version: 3.7
-
-      - name: install virtualenvwrapper
-        run: pip install virtualenv virtualenvwrapper
 
       - name: upload
         env:

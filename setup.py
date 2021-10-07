@@ -23,6 +23,7 @@ setup(
     version=version,
     description='''Certbot plugin to authenticate using dns TXT records via Transip API''',
     long_description=readme + '\n\n' + history,
+    long_description_content_type='text/x-rst',
     author='''Wim Fournier''',
     author_email='''wim@fournier.nl''',
     url='''https://github.com/hsmade/certbot_dns_transip''',
