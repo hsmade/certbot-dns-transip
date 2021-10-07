@@ -6,28 +6,21 @@ cd $(dirname $0)/../..
 
 rm -rf build dist
 
-if test -n "${TRAVIS}"
-then
-    if test -z "${TRAVIS_TAG}"
-    then
-        echo "Not a tagged build, not uploading"
-        exit 0
-    fi
-    echo "Creating pypirc file"
-    cat << EOF > ~/.pypirc
+echo "Creating pypirc file"
+cat << EOF > ~/.pypirc
 [distutils]
 index-servers = pypi
 
 [pypi]
-username: ${PYPI_USER}
-password: ${PYPI_PASSWORD}
+username: __token__
+password: ${PYPI}
 EOF
-fi
+
 # we want all these files to exist in the actual package
 _CI/scripts/copy_version_file
 
 python setup.py -v sdist upload --show-response -r pypi
 
-test -n "${TRAVIS}" && rm -vf ~/.pypirc
+rm -vf ~/.pypirc
 
 _CI/scripts/remove_version_file
