@@ -3,6 +3,13 @@
 History
 -------
 
+0.4.1 (07-10-2021)
+---------------------
+
+* refactored code to use new v6 API
+* changed workflow to github actions
+* updated docker base image to python:3.9
+
 0.3.0 (24-03-2020)
 ---------------------
 
