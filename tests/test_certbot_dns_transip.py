@@ -4,7 +4,7 @@ import certbot
 from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
-from certbot_dns_transip.dns_transip import _TransipClient, Authenticator
+from certbot_dns_transip.dns_transip import _TransipClient
 import mock
 import os
 from tempfile import mktemp
@@ -17,6 +17,7 @@ USERNAME = 'foobar'
 KEY_FILE = mktemp()
 
 
+# wrap the class we want to test, to remove the client init in __init__ (as it will break)
 class _TransipClientTest(_TransipClient):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -38,9 +39,6 @@ foobar
         self.transip_client.client = self.client
         self.transip_client.client.domains = self.client
         self.transip_client.client.domains.list.return_value = [_DomainMock(name="example.com")]
-
-        # self.correct_entry1 = {"name": "record1", "record_type": "A", "content": "127.0.0.1", "expire": 1}
-        # self.correct_entry2 = {"name": "record2", "record_type": "TXT", "content": "f00b4r", "expire": 1}
         self.add_record = {"name": "test.test", "type": "TXT", "content": "new record", "expire": 1}
 
     def tearDown(self):
