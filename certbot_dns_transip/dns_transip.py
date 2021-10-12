@@ -5,6 +5,7 @@
 import logging
 import os
 from tempfile import mktemp
+from distutils.util import strtobool
 
 import transip
 import zope.interface
@@ -80,6 +81,11 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _get_transip_client(self):
         username = self.credentials.conf('username')
+        global_key = self.credentials.conf('global_key')
+        if global_key:
+            global_key = bool(strtobool(global_key))
+        else:
+            global_key = False
         if not self.credentials.conf('key_file'):
             if self.credentials.conf('rsa_key'):
                 key_file = mktemp()
@@ -91,15 +97,15 @@ class Authenticator(dns_common.DNSAuthenticator):
         else:
             key_file = self.credentials.conf('key_file')
         self.logger.debug('Creating Transip API client for user %s', username)
-        return _TransipClient(username=username, key_file=key_file)
+        return _TransipClient(username=username, key_file=key_file, global_key=global_key)
 
 
 class _TransipClient:
     """Encapsulates all communication with the Transip API."""
 
-    def __init__(self, username, key_file):
+    def __init__(self, username, key_file, global_key):
         self.logger = LOGGER.getChild(self.__class__.__name__)
-        self.client = transip.TransIP(login=username, private_key_file=key_file)
+        self.client = transip.TransIP(login=username, private_key_file=key_file, global_key=global_key)
 
     def add_txt_record(self, domain_name, record_name, record_content):
         """
