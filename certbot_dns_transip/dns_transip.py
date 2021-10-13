@@ -84,9 +84,9 @@ class Authenticator(dns_common.DNSAuthenticator):
         global_key = False
         try:
             global_key = bool(strtobool(self.credentials.conf('global_key')))
-        except (ValueError):
+        except ValueError:
             raise ValueError("dns_transip_global_key should have either 'yes' or 'no' as value")
-        except (AttributeError): # global_key was not present in the config, use default
+        except AttributeError:  # global_key was not present in the config, use default
             pass
 
         if not self.credentials.conf('key_file'):
