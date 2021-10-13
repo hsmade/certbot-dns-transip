@@ -81,11 +81,14 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _get_transip_client(self):
         username = self.credentials.conf('username')
-        global_key = self.credentials.conf('global_key')
-        if global_key:
-            global_key = bool(strtobool(global_key))
-        else:
-            global_key = False
+        global_key = False
+        try:
+            global_key = bool(strtobool(self.credentials.conf('global_key')))
+        except (ValueError):
+            raise ValueError("dns_transip_global_key should have either 'yes' or 'no' as value")
+        except (AttributeError): # global_key was not present in the config, use default
+            pass
+
         if not self.credentials.conf('key_file'):
             if self.credentials.conf('rsa_key'):
                 key_file = mktemp()
