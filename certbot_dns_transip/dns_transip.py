@@ -8,7 +8,6 @@ from tempfile import mktemp
 from distutils.util import strtobool
 
 import transip
-import zope.interface
 from certbot import errors
 from certbot import interfaces
 from certbot.plugins import dns_common
@@ -26,8 +25,6 @@ TRANSIP_EXCEPTIONS = (
 )
 
 
-@zope.interface.implementer(interfaces.IAuthenticator)
-@zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
 
     """
