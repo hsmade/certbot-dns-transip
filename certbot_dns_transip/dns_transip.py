@@ -5,7 +5,6 @@
 import logging
 import os
 from tempfile import mktemp
-from distutils.util import strtobool
 
 import transip
 from certbot import errors
@@ -22,6 +21,15 @@ TRANSIP_EXCEPTIONS = (
     transip.exceptions.TransIPIOError,
     transip.exceptions.TransIPParsingError
 )
+
+
+def _strtobool(value):
+    value = value.lower()
+    if value in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    if value in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    raise ValueError("invalid truth value {0!r}".format(value))
 
 
 class Authenticator(dns_common.DNSAuthenticator):
@@ -79,7 +87,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         username = self.credentials.conf('username')
         global_key = False
         try:
-            global_key = bool(strtobool(self.credentials.conf('global_key')))
+            global_key = bool(_strtobool(self.credentials.conf('global_key')))
         except ValueError:
             raise ValueError("dns_transip_global_key should have either 'yes' or 'no' as value")
         except AttributeError:  # global_key was not present in the config, use default
